@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Маркетинг как управляемая система</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0a0a0a;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --font-family: 'Golos Text', sans-serif;
+            --cherry-glow: rgba(110, 0, 15, 0.8);
+            --cherry-glow-light: rgba(110, 0, 15, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-border-top: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -2;
+            pointer-events: none;
+        }
+        .glow-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: rgba(110, 0, 15, 0.25); }
+        .glow-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: rgba(110, 0, 15, 0.15); }
+
+        /* ШАПКА */
+        .header {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%;
+            padding: 1rem 0; 
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 2px solid rgba(150, 0, 30, 0.8);
+            box-shadow: 0 4px 20px rgba(150, 0, 30, 0.4);
+        }
+        
+        .header-content { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+
+        .logo-wrap {
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+        }
+
+        #webgl-container {
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+        }
+        
+        .logo { 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: #ffffff; 
+            text-decoration: none; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 30px rgba(150, 0, 30, 0.9);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .nav-links { 
+            display: flex; 
+            gap: 2.5rem; 
+            list-style: none; 
+        }
+        
+        .nav-links a { 
+            color: var(--text-main); 
+            text-decoration: none; 
+            font-size: 1.1rem; 
+            font-weight: 500; 
+            transition: all 0.3s ease; 
+            opacity: 0.8; 
+        }
+        .nav-links a:hover { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        .burger-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        @media screen and (max-width: 968px) {
+            .burger-btn { display: block; }
+            .nav-links {
+                position: fixed; top: 0; right: -100%; width: 100%; height: 100vh;
+                background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px);
+                flex-direction: column; justify-content: center; align-items: center;
+                transition: right 0.4s ease; gap: 2rem;
+            }
+            .nav-links.active { right: 0; }
+            .nav-links a { font-size: 1.5rem; }
+        }
+
+        /* ОБЩИЕ СТИЛИ КНОПОК И КАРТОЧЕК */
+        .t-btn {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.03) !important; 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 24px;
+            padding: 1.25rem 2rem;
+            font-family: var(--font-family);
+            font-weight: 500;
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(110, 0, 15, 0.6), 0 5px 15px rgba(0, 0, 0, 0.5); 
+            flex: 1;
+        }
+
+        .t-btn:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: inset 0 0 40px rgba(150, 0, 30, 0.8), 0 10px 30px rgba(150, 0, 30, 0.5);
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-border-top);
+            border-radius: 24px;
+            padding: 3.5rem 2.5rem;
+            display: flex; flex-direction: column; gap: 1.5rem;
+            transition: all 0.4s ease;
+            position: relative; overflow: hidden; z-index: 1; height: 100%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px var(--cherry-glow-light);
+        }
+
+        h1 { font-size: clamp(3rem, 6vw, 4.5rem); line-height: 1.1; font-weight: 700; margin-bottom: 1.5rem; }
+        h2 { font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 700; margin-bottom: 4rem; text-align: center; }
+
+        .screen-section {
+            min-height: 100vh;
+            display: flex; flex-direction: column; justify-content: center;
+            position: relative; padding: 120px 0;
+        }
+
+        /* HERO СЕКЦИЯ */
+        .hero-top {
+            display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem; align-items: center; margin-bottom: 3rem;
+        }
+        .hero-text { display: flex; flex-direction: column; }
+        .hero-pretitle {
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 1px; display: block;
+        }
+        .hero-desc { font-size: clamp(1.2rem, 2vw, 1.4rem); color: var(--text-muted); line-height: 1.6; }
+        .hero-metrics {
+            display: flex; flex-direction: column; gap: 1.2rem; margin: 2.5rem 0; padding-left: 1.5rem; border-left: 2px solid rgba(150, 0, 30, 0.6);
+        }
+        .metric-title { font-size: 1.2rem; font-weight: 600; color: #ffffff; }
+        .metric-desc { font-size: 1rem; color: var(--text-muted); }
+        .hero-image-wrap { width: 100%; display: flex; justify-content: center; }
+        .hero-image {
+            width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px var(--cherry-glow-light);
+            border: 1px solid var(--glass-border-top);
+        }
+        .hero-bottom-buttons { display: flex; gap: 2rem; width: 100%; }
+
+        @media screen and (max-width: 968px) {
+            .hero-top { grid-template-columns: 1fr; gap: 2rem; }
+            .hero-bottom-buttons { flex-direction: column; gap: 1rem; }
+        }
+
+        .anim-step { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .anim-step.is-visible { opacity: 1; transform: translateY(0); }
+        .delay-1 { transition-delay: 0.1s; } .delay-2 { transition-delay: 0.2s; }
+
+        /* КАРУСЕЛЬ УСЛУГ */
+        .carousel-wrapper { position: relative; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 50px; }
+        .carousel-track-container { overflow: hidden; width: 100%; padding: 20px 0; }
+        .carousel-track { display: flex; gap: 2rem; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); list-style: none; }
+        .carousel-slide { flex: 0 0 calc(33.333% - 1.35rem); min-width: 320px; height: auto; }
+        .carousel-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(20, 20, 20, 0.8); border: 1px solid var(--glass-border-top);
+            border-radius: 50%; width: 48px; height: 48px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; color: #ffffff;
+            transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); z-index: 10;
+        }
+        .carousel-btn:hover { background: #6e000f; box-shadow: 0 0 20px rgba(110, 0, 15, 0.8); }
+        .carousel-btn.prev { left: -10px; }
+        .carousel-btn.next { right: -10px; }
+        .card-content-wrap { display: flex; flex-direction: column; gap: 1.2rem; height: 100%; }
+        .card-h3 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .card-text { font-size: 1.05rem; color: var(--text-muted); line-height: 1.5; }
+        .card-result { margin-top: auto; padding-top: 1.2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 1.05rem; }
+
+        @media screen and (max-width: 1024px) {
+            .carousel-slide { flex: 0 0 calc(50% - 1rem); }
+        }
+        @media screen and (max-width: 768px) {
+            .carousel-slide { flex: 0 0 100%; min-width: 100%; }
+            .carousel-wrapper { padding: 0 15px; }
+            .carousel-btn { display: none; }
+            .carousel-track-container { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+            .carousel-track-container::-webkit-scrollbar { display: none; }
+            .carousel-slide { scroll-snap-align: center; }
+        }
+
+        /* B2B ВОРОНКА */
+        .b2b-funnel-wrap {
+            padding: 60px 0;
+            position: relative;
+            color: #ffffff;
+            background: transparent;
+            width: 100%;
+        }
+
+        .b2b-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .b2b-card {
+            background: rgba(45, 48, 52, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 3.5rem 3rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(110, 0, 15, 0.2);
+        }
+
+        .b2b-title {
+            font-size: clamp(1.8rem, 2.5vw, 2.3rem);
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .b2b-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 2.5rem auto;
+            line-height: 1.5;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .calc-control {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .calc-label { font-size: 0.95rem; color: rgba(255, 255, 255, 0.8); }
+        .calc-val { font-size: 1.2rem; font-weight: 700; color: #ff0055; }
+        .calc-range {
+            width: 100%; height: 5px; background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px; outline: none; -webkit-appearance: none; cursor: pointer; accent-color: #ff0055;
+        }
+
+        .calc-results-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .calc-res-item { display: flex; flex-direction: column; gap: 0.4rem; }
+        .calc-res-title { color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; }
+        .calc-res-num { font-size: 1.5rem; font-weight: 700; color: #ffffff; }
+        .calc-res-num.highlight { color: #ff0055; }
+
+        /* Квиз (Тест) */
+        .sa-progress-bar { display: flex; gap: 6px; margin-bottom: 2.5rem; }
+        .sa-segment { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; transition: background 0.3s ease; }
+        .sa-segment.active { background: #ff0055; box-shadow: 0 0 10px rgba(255, 0, 85, 0.8); }
+        .sa-step { display: none; flex-direction: column; gap: 1.5rem; animation: b2bFade 0.4s ease forwards; }
+        .sa-step.active { display: flex; }
+        @keyframes b2bFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sa-question-title { font-size: 1.3rem; font-weight: 600; line-height: 1.4; color: #ffffff; margin: 0; }
+        .sa-answers { display: flex; flex-direction: column; gap: 0.8rem; }
+        .sa-btn {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; padding: 1.1rem 1.4rem; color: #ffffff !important; -webkit-text-fill-color: #ffffff;
+            font-size: 1rem; text-align: left; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .sa-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 0, 85, 0.6); }
+        .sa-diag-box {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; padding: 1.8rem; display: flex; flex-direction: column; gap: 1.2rem;
+        }
+        .sa-row-title { color: #ff0055; font-weight: 600; font-size: 1.05rem; }
+        .sa-row-text { color: rgba(255, 255, 255, 0.9); line-height: 1.5; margin-top: 0.3px; }
+
+        /* Конфигуратор */
+        .sc-params-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+        .sc-param-box {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem;
+        }
+        .sc-param-header { display: flex; justify-content: space-between; align-items: center; }
+        .sc-param-label { font-size: 0.9rem; color: rgba(255, 255, 255, 0.8); }
+        .sc-param-value { font-size: 1.05rem; font-weight: 700; color: #ff0055; }
+        
+        .sc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .sc-card {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; padding: 1.5rem 1rem; display: flex; flex-direction: column;
+            justify-content: space-between; transition: all 0.3s ease; cursor: pointer; position: relative;
+        }
+        .sc-card:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 0, 85, 0.6); }
+        
+        .sc-card.recommended {
+            border: 2px solid #ff0055;
+            background: rgba(255, 0, 85, 0.08);
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.3);
+        }
+        .sc-rec-badge {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: #ff0055; color: #fff; font-size: 0.7rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px; text-transform: uppercase; display: none; white-space: nowrap;
+        }
+        .sc-card.recommended .sc-rec-badge { display: block; }
+
+        .sc-card-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.3rem 0; color: #ffffff; }
+        .sc-card-desc { font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 1rem; line-height: 1.4; white-space: normal; }
+        .sc-calc-metrics {
+            display: flex; flex-direction: column; gap: 0.6rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.9rem 0; margin-bottom: 1rem;
+        }
+        .sc-metric-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; white-space: nowrap; }
+        .sc-metric-name { color: rgba(255, 255, 255, 0.6); }
+        .sc-metric-val { font-weight: 600; color: #ffffff; }
+        .sc-metric-val.profit { color: #00e676; }
+        
+        .sc-select-btn {
+            width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px; padding: 0.7rem; color: #ffffff !important; -webkit-text-fill-color: #ffffff;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
+        }
+        .sc-select-btn:hover { background: #ff0055; border-color: #ff0055; }
+
+        .sc-center-cta-wrap {
+            display: flex; justify-content: center; margin-top: 1.5rem;
+        }
+        .sc-main-consult-btn {
+            background: #ff0055; border: none; border-radius: 14px;
+            padding: 1rem 2.5rem; color: #ffffff !important; font-size: 1.05rem; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 0, 85, 0.4); transition: all 0.3s ease;
+        }
+        .sc-main-consult-btn:hover { background: #e0004c; transform: translateY(-2px); }
+
+        .sc-result-actions {
+            display: none; flex-direction: column; gap: 1.2rem;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 0, 85, 0.6);
+            border-radius: 16px; padding: 2rem; text-align: center;
+        }
+        
+        .sc-action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+        
+        .sc-link {
+            display: flex; align-items: center; justify-content: center; padding: 1.1rem;
+            border-radius: 12px; color: #ffffff !important; -webkit-text-fill-color: #ffffff;
+            text-decoration: none; font-weight: 500; transition: all 0.3s ease;
+            background: rgba(110, 0, 15, 0.25); border: 1px solid rgba(255, 0, 85, 0.4); cursor: pointer;
+            box-shadow: inset 0 0 15px rgba(110, 0, 15, 0.5), 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .sc-link.tg:hover { background: #0088cc !important; border-color: #0088cc !important; box-shadow: 0 0 20px rgba(0, 136, 204, 0.6); }
+        .sc-link.wa:hover { background: #25d366 !important; border-color: #25d366 !important; box-shadow: 0 0 20px rgba(37, 211, 102, 0.6); }
+        .sc-link.phone { background: #ff0055; border-color: #ff0055; box-shadow: 0 4px 20px rgba(255, 0, 85, 0.5); font-weight: 600; }
+        .sc-link.phone:hover { background: #e0004c; }
+
+        /* ВИДЕО И КОНТАКТЫ */
+        .unified-section { padding: 90px 0; position: relative; }
+        .media-box-container {
+            max-width: 900px; margin: 0 auto 6rem auto; text-align: center;
+            background: rgba(20, 20, 20, 0.6); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px; padding: 3.5rem 2.5rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(110, 0, 15, 0.4);
+        }
+        .video-poster-wrap {
+            position: relative; padding-top: 56.25%; width: 100%; border-radius: 16px;
+            overflow: hidden; background: #000; border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); cursor: pointer;
+        }
+        .video-poster-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(10,10,10,0.4) 0%, rgba(10,10,10,0.85) 100%);
+            display: flex; align-items: center; justify-content: center; transition: opacity 0.4s ease; z-index: 2;
+        }
+        .play-btn-circle {
+            width: 80px; height: 80px; background: rgba(110, 0, 15, 0.9); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px rgba(110, 0, 15, 0.8), 0 0 60px rgba(110, 0, 15, 0.6);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        .video-poster-wrap:hover .play-btn-circle { transform: scale(1.1); background: #6e000f; }
+        .play-btn-circle svg { fill: #ffffff; width: 28px; height: 28px; margin-left: 4px; }
+        .video-iframe-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .video-iframe-container iframe { width: 100%; height: 100%; border: 0; }
+
+        .final-contact-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 3.5rem; align-items: center; max-width: 1200px; margin: 0 auto; }
+        .final-contact-info h2 { text-align: left; font-size: clamp(2.2rem, 3.5vw, 3.2rem); margin-bottom: 1.2rem; color: #ffffff; }
+        .final-contact-info p { color: var(--text-muted); font-size: 1.15rem; margin-bottom: 2.5rem; line-height: 1.6; }
+        .clean-contact-stack { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .clean-btn {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 2rem; background: rgba(110, 0, 15, 0.25); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 0, 85, 0.4); border-radius: 16px; color: #ffffff !important;
+            text-decoration: none !important; font-size: 1.1rem; font-weight: 500; transition: all 0.3s ease;
+            box-shadow: inset 0 0 15px rgba(110, 0, 15, 0.5);
+        }
+        .clean-btn.tg:hover { background: #0088cc !important; border-color: #0088cc !important; box-shadow: 0 0 20px rgba(0, 136, 204, 0.6); transform: translateY(-2px); }
+        .clean-btn.wa:hover { background: #25d366 !important; border-color: #25d366 !important; box-shadow: 0 0 20px rgba(37, 211, 102, 0.6); transform: translateY(-2px); }
+        .clean-btn.accent { background: #ff0055 !important; border-color: #ff0055 !important; box-shadow: 0 5px 20px rgba(255, 0, 85, 0.5); }
+        .clean-btn.accent:hover { background: #e0004c !important; transform: translateY(-2px); }
+
+        .metrics-side-box { display: flex; flex-direction: column; gap: 1.2rem; }
+        .mini-stat-card {
+            padding: 1.5rem 2rem; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; display: flex; flex-direction: column; gap: 0.2rem;
+        }
+        .mini-stat-num { font-size: 1.8rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(110, 0, 15, 0.5); }
+        .mini-stat-text { font-size: 0.95rem; color: var(--text-muted); }
+
+        @media screen and (max-width: 968px) {
+            .final-contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .final-contact-info h2, .final-contact-info p { text-align: center; }
+        }
+
+        /* Модальное окно */
+        .sc-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 999999;
+        }
+        .sc-modal-overlay.active { opacity: 1; visibility: visible; }
+        .sc-modal-content {
+            background: rgba(45, 48, 52, 0.95); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 400px; position: relative;
+        }
+        .sc-modal-close {
+            position: absolute; top: 15px; right: 15px; background: transparent;
+            border: none; color: #ffffff; font-size: 1.5rem; cursor: pointer;
+        }
+        .sc-form-group { margin-bottom: 1.2rem; }
+        .sc-form-input {
+            width: 100%; padding: 1rem 1.2rem; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; color: #ffffff; font-size: 1rem; outline: none;
+        }
+        .sc-form-checkbox-wrap { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 1.5rem; }
+        .sc-form-checkbox { margin-top: 4px; accent-color: #ff0055; cursor: pointer; }
+        .sc-form-consent { color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; line-height: 1.4; text-align: left; }
+        .sc-form-submit {
+            width: 100%; background: #ff0055; border: none; border-radius: 12px;
+            padding: 1rem; color: #ffffff !important; font-size: 1.1rem; font-weight: 600; cursor: pointer;
+        }
+
+        /* ФУТЕР */
+        .footer { width: 100%; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); border-top: 1px solid rgba(150, 0, 30, 0.4); padding: 3rem 2rem 1rem; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto 2rem; }
+        .footer-col h4 { color: #ffffff; font-size: 1.2rem; margin-bottom: 1.2rem; }
+        .footer-col a { display: block; color: var(--text-muted); text-decoration: none; margin-bottom: 0.8rem; }
+        .footer-col a:hover { color: #ffffff; }
+        .footer-bottom { text-align: center; color: rgba(255, 255, 255, 0.3); font-size: 0.85rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+        @media screen and (max-width: 900px) {
+            .calc-grid, .sc-grid, .sc-params-grid, .calc-results-box { grid-template-columns: 1fr; }
+            .b2b-card { padding: 2.5rem 1.5rem; }
+            .sc-action-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo-wrap">
+                <div id="webgl-container"></div>
+                <a href="#" class="logo">Marketing System</a>
+            </div>
+            
+            <div class="header-right">
+                <nav>
+                    <ul class="nav-links" id="navLinks">
+                        <li><a href="#services">Направления</a></li>
+                        <li><a href="#audit">Диагностика</a></li>
+                        <li><a href="#configurator">Калькулятор</a></li>
+                        <li><a href="#contacts">Контакты</a></li>
+                    </ul>
+                </nav>
+                <button class="burger-btn" id="burgerBtn">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Секция 1: Hero -->
+        <section class="screen-section hero">
+            <div class="container">
+                <div class="hero-top">
+                    <div class="hero-text">
+                        <span class="hero-pretitle anim-step">агентство системного маркетинга</span>
+                        <h1 class="anim-step">Маркетинг как<br>управляемая система</h1>
+                        <p class="hero-desc anim-step delay-1">Входим в бизнес как партнёры. Переводим маркетинг из хаоса в оцифрованную воронку: связываем стратегию, брендинг и performance-трафик для кратного роста вашей выручки.</p>
+                        
+                        <div class="hero-metrics anim-step delay-1">
+                            <div class="metric-item">
+                                <span class="metric-title">50+ проектов</span>
+                                <span class="metric-desc">реализовали стратегии в b2b и сложных нишах</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-title">фокус на romi</span>
+                                <span class="metric-desc">оцифровываем каждый вложенный рубль</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-title">полный цикл</span>
+                                <span class="metric-desc">закрываем задачи от ux-дизайна до лидогенерации</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-image-wrap anim-step delay-2">
+                        <img src="https://i.yapx.ru/eUOTQ.jpg" alt="Team" class="hero-image">
+                    </div>
+                </div>
+                
+                <div class="hero-bottom-buttons anim-step delay-2">
+                    <a href="#contacts" class="t-btn" id="heroContactBtn">Связаться с нами</a>
+                    <a href="#services" class="t-btn">Смотреть кейсы</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция 2: Карусель услуг на 6 карточек -->
+        <section class="screen-section services" id="services">
+            <div class="container">
+                <h2 class="anim-step">Направления работы</h2>
+                
+                <div class="carousel-wrapper anim-step delay-1">
+                    <button class="carousel-btn prev" id="btnPrev">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    
+                    <div class="carousel-track-container" id="trackContainer">
+                        <ul class="carousel-track" id="track">
+                            <li class="carousel-slide glass-card">
+                                <div class="card-content-wrap">
+                                    <h3 class="card-h3">комплексная стратегия</h3>
+                                    <p class="card-text">кому подойдет: проектам с разрозненными инструментами и сливом бюджета.</p>
+                                    <p class="card-result"><strong style="color:#fff;">результат:</strong> дорожная карта, оцифрованный объем рынка и понятные метрики.</p>
+                                </div>
+                            </li>
+                            <li class="carousel-slide glass-card">
+                                <div class="card-content-wrap">
+                                    <h3 class="card-h3">performance-трафик</h3>
+                                    <p class="card-text">кому подойдет: бизнесам с нестабильным потоком заявок.</p>
+                                    <p class="card-result"><strong style="color:#fff;">результат:</strong> прогнозируемый поток целевых лидов со снижением стоимости заявки.</p>
+                                </div>
+                            </li>
+                            <li class="carousel-slide glass-card">
+                                <div class="card-content-wrap">
+                                    <h3 class="card-h3">брендинг и дизайн</h3>
+                                    <p class="card-text">кому подойдет: компаниям, чей сайт уступает конкурентам по визуалу.</p>
+                                    <p class="card-result"><strong style="color:#fff;">результат:</strong> сильный бренд и ux-дизайн, работающий как воронка продаж.</p>
+                                </div>
+                            </li>
+                            <li class="carousel-slide glass-card">
+                                <div class="card-content-wrap">
+                                    <h3 class="card-h3">smm-сопровождение</h3>
+                                    <p class="card-text">кому подойдет: проектам, где соцсети не приносят заявок и продаж.</p>
+                                    <p class="card-result"><strong style="color:#fff;">результат:</strong> социальные сети становятся полноценным и управляемым каналом лидогенерации.</p>
+                                </div>
+                            </li>
+                            <li class="carousel-slide glass-card">
+                                <div class="card-content-wrap">
+                                    <h3 class="card-h3">crm-маркетинг</h3>
+                                    <p class="card-text">кому подойдет: компаниям, которые теряют клиентов после первой сделки и не умеют работать с базой.</p>
+                                    <p class="card-result"><strong style="color:#fff;">результат:</strong> автоматизированные цепочки касаний, которые возвращают ушедших покупателей и повышают ltv.</p>
+                                </div>
+                            </li>
+                            <li class="carousel-slide glass-card">
+                                <div class="card-content-wrap">
+                                    <h3 class="card-h3">контент-продакшен</h3>
+                                    <p class="card-text">кому подойдет: брендам, которым сложно донести ценность продукта через обычный текст или стоковые фото.</p>
+                                    <p class="card-result"><strong style="color:#fff;">результат:</strong> визуальный контент премиального уровня, который удерживает внимание и повышает конверсию.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <button class="carousel-btn next" id="btnNext">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция B2B Воронки: Калькулятор, Квиз и Конфигуратор -->
+        <div class="b2b-funnel-wrap" id="configurator">
+            <div class="b2b-container">
+                
+                <!-- Блок 1: Калькулятор упущенной выгоды -->
+                <div class="b2b-card anim-step">
+                    <h2 class="b2b-title" style="margin-bottom: 0.5rem;">Калькулятор упущенной выгоды</h2>
+                    <p class="b2b-subtitle">Узнайте, сколько денег теряет ваш бизнес из-за хаоса в маркетинге.</p>
+                    
+                    <div class="calc-grid">
+                        <div class="calc-control">
+                            <span class="calc-label">Рекламный бюджет в месяц:</span>
+                            <span class="calc-val" id="cbBudgetVal">500 000 ₽</span>
+                            <input type="range" min="0" max="5000000" step="50000" value="500000" class="calc-range" id="cbBudgetRange" oninput="updateCalculator()">
+                        </div>
+                        <div class="calc-control">
+                            <span class="calc-label">Средний чек сделки:</span>
+                            <span class="calc-val" id="cbCheckVal">100 000 ₽</span>
+                            <input type="range" min="10000" max="1000000" step="10000" value="100000" class="calc-range" id="cbCheckRange" oninput="updateCalculator()">
+                        </div>
+                    </div>
+
+                    <div class="calc-results-box">
+                        <div class="calc-res-item">
+                            <span class="calc-res-title">Слитый бюджет в год (~35%):</span>
+                            <span class="calc-res-num highlight" id="cbLosses">2 100 000 ₽</span>
+                        </div>
+                        <div class="calc-res-item">
+                            <span class="calc-res-title">Потенциал роста выручки:</span>
+                            <span class="calc-res-num" id="cbGrowth">+6.0 млн ₽</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок 2: Экспресс-тест (Диагностика) -->
+                <div class="b2b-card anim-step" id="audit">
+                    <h2 class="b2b-title" style="margin-bottom: 2.5rem;">Диагностика системы маркетинга</h2>
+                    
+                    <div class="sa-progress-bar">
+                        <div class="sa-segment active" id="seg-1"></div>
+                        <div class="sa-segment" id="seg-2"></div>
+                        <div class="sa-segment" id="seg-3"></div>
+                        <div class="sa-segment" id="seg-4"></div>
+                        <div class="sa-segment" id="seg-5"></div>
+                        <div class="sa-segment" id="seg-6"></div>
+                    </div>
+
+                    <div class="sa-step active" id="step-1">
+                        <div class="sa-question-title">1. как у вас выстроен поток заявок из цифровых каналов?</div>
+                        <div class="sa-answers">
+                            <button class="sa-btn" onclick="nextStep(1, 1)">инструменты запускаются хаотично, единой связки нет <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(1, 2)">лиды идут, но поток нестабилен (густо/пусто) <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(1, 3)">есть стабильные каналы, но масштабировать их сложно <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(1, 4)">омниканальная система, поток предсказуем <span>→</span></button>
+                        </div>
+                    </div>
+
+                    <div class="sa-step" id="step-2">
+                        <div class="sa-question-title">2. на каком уровне у вас оцифрована аналитика?</div>
+                        <div class="sa-answers">
+                            <button class="sa-btn" onclick="nextStep(2, 1)">считаем только общие затраты и выручку <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(2, 2)">знаем стоимость заявки, но не видим продажи <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(2, 3)">понимаем окупаемость по ключевым каналам <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(2, 4)">полная аналитика до рубля в реальном времени <span>→</span></button>
+                        </div>
+                    </div>
+
+                    <div class="sa-step" id="step-3">
+                        <div class="sa-question-title">3. что происходит с конверсией сайта?</div>
+                        <div class="sa-answers">
+                            <button class="sa-btn" onclick="nextStep(3, 1)">сайт старый, конверсию не отслеживаем <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(3, 2)">трафик идет, но конверсия падает <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(3, 3)">конверсия стабильна, сайт дорабатывается <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(3, 4)">выстроена система тестов под разные сегменты <span>→</span></button>
+                        </div>
+                    </div>
+
+                    <div class="sa-step" id="step-4">
+                        <div class="sa-question-title">4. как вы работаете с базой и повторными продажами?</div>
+                        <div class="sa-answers">
+                            <button class="sa-btn" onclick="nextStep(4, 1)">фокус только на новых клиентах <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(4, 2)">база есть, но рассылки делаем редко <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(4, 3)">регулярные рассылки приносят выручку <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(4, 4)">настроены автоматизированные воронки удержания <span>→</span></button>
+                        </div>
+                    </div>
+
+                    <div class="sa-step" id="step-5">
+                        <div class="sa-question-title">5. кто управляет интернет-маркетингом?</div>
+                        <div class="sa-answers">
+                            <button class="sa-btn" onclick="nextStep(5, 1)">собственник сам или разрозненные фрилансеры <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(5, 2)">маркетолог в штате, но завален рутиной <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(5, 3)">работаем с агентствами, управляем вручную <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(5, 4)">интегрированная команда, работающая по KPI <span>→</span></button>
+                        </div>
+                    </div>
+
+                    <div class="sa-step" id="step-6">
+                        <div class="sa-question-title">6. главная цель маркетинга на этот квартал?</div>
+                        <div class="sa-answers">
+                            <button class="sa-btn" onclick="nextStep(6, 1)">остановить слив бюджета и получить заявки <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(6, 2)">выровнять лидогенерацию, убрать кассовые разрывы <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(6, 3)">безопасно масштабировать бюджет <span>→</span></button>
+                            <button class="sa-btn" onclick="nextStep(6, 4)">агрессивный захват доли рынка <span>→</span></button>
+                        </div>
+                    </div>
+
+                    <div class="sa-step" id="step-result">
+                        <div class="sa-diag-box">
+                            <div>
+                                <span class="sa-row-title" id="resScore">статус системы</span>
+                            </div>
+                            <div>
+                                <span class="sa-row-title">диагноз:</span>
+                                <div class="sa-row-text" id="resDiag">...</div>
+                            </div>
+                            <div>
+                                <span class="sa-row-title">решение:</span>
+                                <div class="sa-row-text" id="resAction">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок 3: Конфигуратор тарифов -->
+                <div class="b2b-card anim-step">
+                    <h2 class="b2b-title" style="margin-bottom: 0.5rem;">Конфигуратор решений и окупаемости</h2>
+                    <p class="b2b-subtitle">Настройте параметры вашей задачи. Система автоматически подберет и подсветит оптимальный тариф.</p>
+
+                    <div class="sc-params-grid">
+                        <div class="sc-param-box">
+                            <div class="sc-param-header">
+                                <span class="sc-param-label">Ваш текущий бюджет:</span>
+                                <span class="sc-param-value" id="scBudgetVal">1 000 000 ₽</span>
+                            </div>
+                            <input type="range" min="0" max="5000000" step="50000" value="1000000" class="calc-range" id="scBudgetRange" oninput="scUpdateCalculations()">
+                        </div>
+                        <div class="sc-param-box">
+                            <div class="sc-param-header">
+                                <span class="sc-param-label">Целевой масштаб роста:</span>
+                                <span class="sc-param-value" id="scGoalVal">Х2 (Масштабирование)</span>
+                            </div>
+                            <input type="range" min="1" max="4" step="1" value="2" class="calc-range" id="scGoalRange" oninput="scUpdateCalculations()">
+                        </div>
+                    </div>
+
+                    <div class="sc-grid">
+                        <div class="sc-card" id="tierCard1" onclick="scSelectTier()">
+                            <div class="sc-rec-badge">Рекомендуем</div>
+                            <div>
+                                <h3 class="sc-card-title">1. Старт</h3>
+                                <div class="sc-card-desc">Аудит связок и устранение базовых точек слива бюджета.</div>
+                            </div>
+                            <div class="sc-calc-metrics">
+                                <div class="sc-metric-row"><span class="sc-metric-name">Цена пакета:</span><span class="sc-metric-val" id="scPrice1">150 000 ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Прирост выручки:</span><span class="sc-metric-val profit" id="scProfit1">+1.5 млн ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Окупаемость:</span><span class="sc-metric-val">за квартал</span></div>
+                            </div>
+                            <button class="sc-select-btn">Выбрать пакет</button>
+                        </div>
+
+                        <div class="sc-card" id="tierCard2" onclick="scSelectTier()">
+                            <div class="sc-rec-badge">Рекомендуем</div>
+                            <div>
+                                <h3 class="sc-card-title">2. Оптимум</h3>
+                                <div class="sc-card-desc">Внедрение трекинга, переупаковка офферов и стабилизация.</div>
+                            </div>
+                            <div class="sc-calc-metrics">
+                                <div class="sc-metric-row"><span class="sc-metric-name">Цена пакета:</span><span class="sc-metric-val" id="scPrice2">300 000 ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Прирост выручки:</span><span class="sc-metric-val profit" id="scProfit2">+3.2 млн ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Окупаемость:</span><span class="sc-metric-val">за квартал</span></div>
+                            </div>
+                            <button class="sc-select-btn">Выбрать пакет</button>
+                        </div>
+
+                        <div class="sc-card" id="tierCard3" onclick="scSelectTier()">
+                            <div class="sc-rec-badge">Рекомендуем</div>
+                            <div>
+                                <h3 class="sc-card-title">3. Масштаб</h3>
+                                <div class="sc-card-desc">Полная сквозная аналитика и омниканальная система.</div>
+                            </div>
+                            <div class="sc-calc-metrics">
+                                <div class="sc-metric-row"><span class="sc-metric-name">Цена пакета:</span><span class="sc-metric-val" id="scPrice3">450 000 ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Прирост выручки:</span><span class="sc-metric-val profit" id="scProfit3">+6.5 млн ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Окупаемость:</span><span class="sc-metric-val">за квартал</span></div>
+                            </div>
+                            <button class="sc-select-btn">Выбрать пакет</button>
+                        </div>
+
+                        <div class="sc-card" id="tierCard4" onclick="scSelectTier()">
+                            <div class="sc-rec-badge">Рекомендуем</div>
+                            <div>
+                                <h3 class="sc-card-title">4. Экспансия</h3>
+                                <div class="sc-card-desc">Интегрированный маркетинг и захват рынка под ключ.</div>
+                            </div>
+                            <div class="sc-calc-metrics">
+                                <div class="sc-metric-row"><span class="sc-metric-name">Цена пакета:</span><span class="sc-metric-val" id="scPrice4">800 000 ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Прирост выручки:</span><span class="sc-metric-val profit" id="scProfit4">+12.0 млн ₽</span></div>
+                                <div class="sc-metric-row"><span class="sc-metric-name">Окупаемость:</span><span class="sc-metric-val">за квартал</span></div>
+                            </div>
+                            <button class="sc-select-btn">Выбрать пакет</button>
+                        </div>
+                    </div>
+
+                    <div class="sc-center-cta-wrap">
+                        <button class="sc-main-consult-btn" onclick="openModal()">Бесплатная консультация</button>
+                    </div>
+
+                    <div class="sc-result-actions" id="scResultBox">
+                        <h3 style="margin: 0; font-size: 1.2rem; color: #ffffff;">Отличный выбор! Зафиксируем расчет за вашим проектом</h3>
+                        <p style="margin: 0; color: rgba(255,255,255,0.7); font-size: 0.9rem;">Выберите удобный способ связи:</p>
+                        <div class="sc-action-grid">
+                            <a href="https://telegram.org/" target="_blank" class="sc-link tg">Написать в Telegram</a>
+                            <a href="https://wa.me/your_number" target="_blank" class="sc-link wa">Написать в WhatsApp</a>
+                            <button class="sc-link phone" onclick="openModal()">Обратный звонок</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Секция 4: Видео и Контакты -->
+        <section class="unified-section" id="contacts">
+            <div class="container">
+                <div class="media-box-container anim-step">
+                    <h3 style="font-size: 1.3rem; margin-bottom: 2rem; text-align: center; color: #fff;">Мы проектируем маркетинг как единую архитектуру.</h3>
+                    <div class="video-poster-wrap" id="videoPoster">
+                        <div class="video-poster-overlay" id="videoOverlay">
+                            <div class="play-btn-circle">
+                                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                        </div>
+                        <div class="video-iframe-container" id="videoContainer"></div>
+                    </div>
+                </div>
+
+                <div class="final-contact-grid">
+                    <div class="final-contact-info anim-step delay-1">
+                        <h2>Обсудим ваш проект?</h2>
+                        <p>Напишите нам напрямую в мессенджер или позвоните — мы оперативно изучим вашу задачу, проведем аудит текущих процессов и предложим план развития.</p>
+                        
+                        <div class="clean-contact-stack">
+                            <a href="https://t.me/your_username" target="_blank" class="clean-btn tg">
+                                <span>Написать в Telegram</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                            </a>
+                            <a href="https://wa.me/your_number" target="_blank" class="clean-btn wa">
+                                <span>Написать в WhatsApp</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                            </a>
+                            <button class="clean-btn accent" onclick="openModal()" style="border:none; cursor:pointer; width:100%;">
+                                <span>Обратный звонок</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="metrics-side-box anim-step delay-2">
+                        <div class="mini-stat-card">
+                            <span class="mini-stat-num">7+ лет</span>
+                            <span class="mini-stat-text">экспертизы в цифровых воронках и b2b-маркетинге</span>
+                        </div>
+                        <div class="mini-stat-card">
+                            <span class="mini-stat-num">300+</span>
+                            <span class="mini-stat-text">успешно реализованных и оцифрованных проектов</span>
+                        </div>
+                        <div class="mini-stat-card">
+                            <span class="mini-stat-num">100%</span>
+                            <span class="mini-stat-text">фокус на ROMI, бизнес-цели и возврат инвестиций</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Футер -->
+        <footer class="footer anim-step delay-2">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-col">
+                        <h4>О нас</h4>
+                        <a href="#services">Направления</a>
+                        <a href="#contacts">Команда</a>
+                        <a href="#contacts">Вакансии</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Информация</h4>
+                        <a href="#">Документация</a>
+                        <a href="#">Политика конфиденциальности</a>
+                        <a href="#">Условия оказания услуг</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Контакты</h4>
+                        <a href="https://t.me/your_username" target="_blank">Telegram</a>
+                        <a href="https://wa.me/your_number" target="_blank">WhatsApp</a>
+                        <a href="mailto:hello@marketingsystem.ru">hello@marketingsystem.ru</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>© 2026 Marketing System. Все права защищены.</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Модальное окно -->
+    <div class="sc-modal-overlay" id="scModal">
+        <div class="sc-modal-content">
+            <button class="sc-modal-close" onclick="closeModal()">×</button>
+            <h3 style="color: #ffffff; font-size: 1.3rem; margin-top: 0; text-align: center;">Обратный звонок</h3>
+            <p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; text-align: center; margin-bottom: 1.2rem;">Оставьте ваши данные, и мы свяжемся с вами в течение 15 минут.</p>
+            <form onsubmit="submitForm(event)">
+                <div class="sc-form-group">
+                    <input type="text" class="sc-form-input" placeholder="Ваше имя" required>
+                </div>
+                <div class="sc-form-group">
+                    <input type="tel" class="sc-form-input" placeholder="Ваш телефон" required>
+                </div>
+                <div class="sc-form-checkbox-wrap">
+                    <input type="checkbox" class="sc-form-checkbox" id="consent" required checked>
+                    <label for="consent" class="sc-form-consent">Я согласен на обработку персональных данных</label>
+                </div>
+                <button type="submit" class="sc-form-submit">Позвоните мне</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('webgl-container');
+            if (container && typeof THREE !== 'undefined') {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+                camera.position.z = 12;
+
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
+
+                const material = new THREE.MeshPhysicalMaterial({
+                    color: 0x111111, metalness: 1.0, roughness: 0.1, clearcoat: 1.0
+                });
+
+                const geometry = new THREE.TorusKnotGeometry(3, 1.2, 100, 16, 2, 3);
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+                scene.add(ambientLight);
+                
+                const redLight1 = new THREE.PointLight(0xff0033, 4, 20);
+                redLight1.position.set(5, 5, 5);
+                scene.add(redLight1);
+
+                const redLight2 = new THREE.PointLight(0x6e000f, 4, 20);
+                redLight2.position.set(-5, -5, 5);
+                scene.add(redLight2);
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    mesh.rotation.x += 0.01;
+                    mesh.rotation.y += 0.01;
+                    renderer.render(scene, camera);
+                };
+                animate();
+            }
+
+            const burgerBtn = document.getElementById('burgerBtn');
+            const navLinks = document.getElementById('navLinks');
+            if (burgerBtn && navLinks) {
+                burgerBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                    link.addEventListener('click', () => navLinks.classList.remove('active'));
+                });
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('is-visible');
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.anim-step').forEach(el => observer.observe(el));
+
+            const track = document.getElementById('track');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            if (track && btnPrev && btnNext) {
+                const slides = Array.from(track.children);
+                let currentCarouselIndex = 0;
+
+                const updateSlider = () => {
+                    const slideWidth = slides[0].getBoundingClientRect().width;
+                    const gap = parseFloat(getComputedStyle(track).gap) || 32; 
+                    const amountToMove = (slideWidth + gap) * currentCarouselIndex;
+                    track.style.transform = `translateX(-${amountToMove}px)`;
+                };
+
+                btnNext.addEventListener('click', () => {
+                    const trackWidth = document.getElementById('trackContainer').getBoundingClientRect().width;
+                    const slideWidth = slides[0].getBoundingClientRect().width;
+                    const gap = parseFloat(getComputedStyle(track).gap) || 32;
+                    const visibleSlides = Math.round(trackWidth / (slideWidth + gap));
+                    
+                    if (currentCarouselIndex < slides.length - visibleSlides) {
+                        currentCarouselIndex += visibleSlides;
+                        if (currentCarouselIndex > slides.length - visibleSlides) currentCarouselIndex = slides.length - visibleSlides;
+                        updateSlider();
+                    }
+                });
+
+                btnPrev.addEventListener('click', () => {
+                    const trackWidth = document.getElementById('trackContainer').getBoundingClientRect().width;
+                    const slideWidth = slides[0].getBoundingClientRect().width;
+                    const gap = parseFloat(getComputedStyle(track).gap) || 32;
+                    const visibleSlides = Math.round(trackWidth / (slideWidth + gap));
+
+                    if (currentCarouselIndex > 0) {
+                        currentCarouselIndex -= visibleSlides;
+                        if (currentCarouselIndex < 0) currentCarouselIndex = 0;
+                        updateSlider();
+                    }
+                });
+
+                window.addEventListener('resize', () => { currentCarouselIndex = 0; updateSlider(); });
+            }
+
+            const poster = document.getElementById('videoPoster');
+            const overlay = document.getElementById('videoOverlay');
+            const videoContainer = document.getElementById('videoContainer');
+
+            if (poster && overlay && videoContainer) {
+                poster.addEventListener('click', () => {
+                    videoContainer.innerHTML = '<iframe src="https://kinescope.io/embed/4NCkpXvucmj66XE16kMNAH?autoplay=1&playbackRate=0.75" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;" allowfullscreen></iframe>';
+                    overlay.style.opacity = '0';
+                    setTimeout(() => { overlay.style.display = 'none'; }, 400);
+                });
+            }
+
+            const heroBtn = document.getElementById('heroContactBtn');
+            if (heroBtn) {
+                heroBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('contacts').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+            updateCalculator();
+            scUpdateCalculations();
+        });
+
+        function formatMoney(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
+        }
+
+        function updateCalculator() {
+            let budget = parseInt(document.getElementById('cbBudgetRange').value);
+            let check = parseInt(document.getElementById('cbCheckRange').value);
+            
+            document.getElementById('cbBudgetVal').innerText = formatMoney(budget);
+            document.getElementById('cbCheckVal').innerText = formatMoney(check);
+
+            let checkMultiplier = check / 100000;
+            let annualLosses = Math.round(budget * 0.35 * 12 * Math.max(0.8, checkMultiplier * 0.5));
+            let growth = (budget * 3.0 * Math.max(0.8, checkMultiplier * 0.4) / 1000000).toFixed(1);
+
+            document.getElementById('cbLosses').innerText = formatMoney(annualLosses);
+            document.getElementById('cbGrowth').innerText = "+" + growth + " млн ₽";
+        }
+
+        let totalScore = 0;
+        function nextStep(currentStep, points) {
+            totalScore += points;
+            document.querySelectorAll('.sa-step').forEach(el => el.classList.remove('active'));
+            
+            if(currentStep < 6) {
+                document.getElementById('step-' + (currentStep + 1)).classList.add('active');
+                for(let i = 1; i <= (currentStep + 1); i++) {
+                    document.getElementById('seg-' + i).classList.add('active');
+                }
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('step-result').classList.add('active');
+            let grade = "", diag = "", action = "";
+
+            if (totalScore <= 9) {
+                grade = "статус системы: операционный хаос";
+                diag = "маркетинг работает вслепую, из-за разрозненных каналов и отсутствия аналитики до 50% бюджета уходит в пустоту.";
+                action = "экстренная остановка неэффективных кампаний, сбор базовой аналитики и запуск быстрых связок.";
+            } else if (totalScore <= 13) {
+                grade = "статус системы: эффект «дырявого ведра»";
+                diag = "заявки есть, но бизнес штормит, поток зависит от сезонности или удачи, скрытые потери на сайте съедают чистую прибыль.";
+                action = "устранение дыр в конверсии, внедрение трекинга и переупаковка офферов.";
+            } else if (totalScore <= 17) {
+                grade = "статус системы: стеклянный потолок";
+                diag = "попытка увеличить бюджет по старой схеме приводит только к удорожанию лида.";
+                action = "глубокий юнит-аудит и диверсификация каналов.";
+            } else if (totalScore <= 21) {
+                grade = "статус системы: потеря потенциала";
+                diag = "теряете сверхприбыль из-за слабого внимания к текущей базе и повторным продажам.";
+                action = "автоматизация retention-маркетинга и воронки удержания.";
+            } else {
+                grade = "статус системы: готовность к экспансии";
+                diag = "топовый уровень оцифровки, главная задача — искать микроконверсионные улучшения.";
+                action = "тестирование нестандартных гипотез и агрессивный маркетинг.";
+            }
+
+            document.getElementById('resScore').innerText = grade;
+            document.getElementById('resDiag').innerText = diag;
+            document.getElementById('resAction').innerText = action;
+        }
+
+        function scUpdateCalculations() {
+            let budget = parseInt(document.getElementById('scBudgetRange').value);
+            let goal = parseInt(document.getElementById('scGoalRange').value);
+            
+            document.getElementById('scBudgetVal').innerText = formatMoney(budget);
+            
+            let goalText = "Х1.5 (Оптимизация)";
+            if (goal === 2) goalText = "Х2 (Масштабирование)";
+            if (goal === 3) goalText = "Х3 (Агрессивный рост)";
+            if (goal === 4) goalText = "Х5+ (Лидер рынка)";
+            document.getElementById('scGoalVal').innerText = goalText;
+
+            let p1 = Math.max(Math.round(budget * 0.12 / 10000) * 10000, 150000);
+            let p2 = Math.max(Math.round(budget * 0.25 / 10000) * 10000, 300000);
+            let p3 = Math.max(Math.round(budget * 0.40 / 10000) * 10000, 450000);
+            let p4 = Math.max(Math.round(budget * 0.75 / 10000) * 10000, 800000);
+
+            document.getElementById('scPrice1').innerText = formatMoney(p1);
+            document.getElementById('scPrice2').innerText = formatMoney(p2);
+            document.getElementById('scPrice3').innerText = formatMoney(p3);
+            document.getElementById('scPrice4').innerText = formatMoney(p4);
+
+            document.getElementById('scProfit1').innerText = "+" + (budget * 1.5 * (goal*0.5) / 1000000).toFixed(1) + " млн ₽";
+            document.getElementById('scProfit2').innerText = "+" + (budget * 3.2 * (goal*0.5) / 1000000).toFixed(1) + " млн ₽";
+            document.getElementById('scProfit3').innerText = "+" + (budget * 6.5 * (goal*0.5) / 1000000).toFixed(1) + " млн ₽";
+            document.getElementById('scProfit4').innerText = "+" + (budget * 12.0 * (goal*0.5) / 1000000).toFixed(1) + " млн ₽";
+
+            let recTier = 1;
+            if (budget > 300000 || goal >= 2) recTier = 2;
+            if (budget > 1000000 || goal >= 3) recTier = 3;
+            if (budget > 2500000 || goal >= 4) recTier = 4;
+
+            for (let i = 1; i <= 4; i++) {
+                let card = document.getElementById('tierCard' + i);
+                if (i === recTier) {
+                    card.classList.add('recommended');
+                } else {
+                    card.classList.remove('recommended');
+                }
+            }
+        }
+
+        function scSelectTier() {
+            let resultBox = document.getElementById('scResultBox');
+            resultBox.style.display = 'flex';
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function openModal() { document.getElementById('scModal').classList.add('active'); }
+        function closeModal() { document.getElementById('scModal').classList.remove('active'); }
+        function submitForm(e) {
+            e.preventDefault();
+            const modalContent = e.target.closest('.sc-modal-content');
+            const originalHTML = modalContent.innerHTML;
+            modalContent.innerHTML = '<button class="sc-modal-close" onclick="closeModal()">×</button><div style="text-align:center; padding: 2rem 0; color: #ffffff;"><h3 style="color: #6e000f; margin-bottom: 0.5rem;">Спасибо!</h3><p style="color: rgba(255,255,255,0.8);">Заявка успешно отправлена.<br>Мы скоро свяжемся с вами.</p></div>';
+            setTimeout(() => {
+                closeModal();
+                setTimeout(() => { modalContent.innerHTML = originalHTML; }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
